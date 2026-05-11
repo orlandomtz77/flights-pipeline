@@ -1,3 +1,5 @@
 .venv/
 .env
-data/raw/
+raw/data/
+processed/data/
+business/data/
