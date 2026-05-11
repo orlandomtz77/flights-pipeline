@@ -1,16 +1,24 @@
-from processed.transform import transform_data
+from transform import transform_data
 import pandas as pd
 import psycopg2
 import json
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+host = os.getenv("DB_HOST")
+database = os.getenv("DB_NAME")
+user = os.getenv("DB_USER")
+password = os.getenv("DB_PASSWORD")
 
 
 def load_data():
     df_airports, df_airlines, df_fact_flights, df_raw = transform_data()
     conn = psycopg2.connect(
-        host="172.23.48.1",
-        database="flight_db",
-        user="postgres",
-        password="***REMOVED***",
+        host=host,
+        database=database,
+        user=user,
+        password=password,
     )
     cur = conn.cursor()
     for _, row in df_airports.iterrows():
