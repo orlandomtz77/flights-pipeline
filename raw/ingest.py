@@ -67,4 +67,5 @@ def download_data():
         # current_day += timedelta(days=1)
 
 
-download_data()
+if __name__ == "__main__":
+    download_data()
