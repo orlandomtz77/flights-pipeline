@@ -93,3 +93,6 @@ def load_data():
 
     conn.commit()
     conn.close()
+
+
+load_data()

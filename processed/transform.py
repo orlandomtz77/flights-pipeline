@@ -52,12 +52,12 @@ def transform_data():
 
     airlines_dep = (
         df_departure["airline"]
-        .apply(lambda x: {"airline_code": x["iata"], "airline_name": x["name"]})
+        .apply(lambda x: {"airline_code": x.get("iata"), "airline_name": x.get("name")})
         .tolist()
     )
     airlines_arr = (
         df_arrival["airline"]
-        .apply(lambda x: {"airline_code": x["iata"], "airline_name": x["name"]})
+        .apply(lambda x: {"airline_code": x.get("iata"), "airline_name": x.get("name")})
         .tolist()
     )
 
@@ -70,7 +70,7 @@ def transform_data():
     fact_flights_dep = df_departure.apply(
         lambda x: {
             "origin_airport_code": "MEX",
-            "airline_code": x["airline"]["iata"],
+            "airline_code": x["airline"].get("iata"),
             "destination_airport_code": x["arrival"]["airport"].get("iata"),
             "scheduled_departure": x["departure"].get("scheduledTime", {}).get("utc"),
             "actual_departure": x["departure"].get("revisedTime", {}).get("utc"),
@@ -84,7 +84,7 @@ def transform_data():
     fact_flights_arr = df_arrival.apply(
         lambda x: {
             "origin_airport_code": x["departure"]["airport"].get("iata"),
-            "airline_code": x["airline"]["iata"],
+            "airline_code": x["airline"].get("iata"),
             "destination_airport_code": "MEX",
             "scheduled_departure": x["departure"].get("scheduledTime", {}).get("utc"),
             "actual_departure": x["departure"].get("revisedTime", {}).get("utc"),
@@ -98,9 +98,16 @@ def transform_data():
     df_fact_dep = pd.DataFrame(fact_flights_dep)
     df_fact_arr = pd.DataFrame(fact_flights_arr)
     df_fact_flights = pd.concat([df_fact_dep, df_fact_arr])
+    df_fact_flights = pd.concat([df_fact_dep, df_fact_arr]).dropna(
+        subset="scheduled_departure"
+    )
     df_raw = pd.concat([df_departure, df_arrival])
+    print(df_fact_flights.head(3)[["origin_airport_code", "scheduled_departure"]])
     return df_airports, df_airlines, df_fact_flights, df_raw
     # print(f"df_airports: {len(df_airports)} filas")
     # print(f"df_airlines: {len(df_airlines)} filas")
     # print(f"df_flights: {len(df_fact_flights)} filas")
     # print(f"df_raw: {len(df_raw)} filas")
+
+
+transform_data()
