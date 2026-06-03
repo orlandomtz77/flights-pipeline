@@ -2,4 +2,5 @@
 .env
 raw/data/
 processed/data/
-business/data/
+*.pbix
+__pycache__/
