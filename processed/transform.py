@@ -49,6 +49,7 @@ def transform_data():
         ]
     )
     df_airports = pd.concat([df_airports, mex]).drop_duplicates(subset="airport_code")
+    df_airports = df_airports[df_airports["airport_code"].notna()]
 
     airlines_dep = (
         df_departure["airline"]
@@ -66,6 +67,7 @@ def transform_data():
     df_airlines = pd.concat([df_air_dep, df_air_arr]).drop_duplicates(
         subset="airline_code"
     )
+    df_airlines = df_airlines[df_airlines["airline_code"].notna()]
 
     fact_flights_dep = df_departure.apply(
         lambda x: {
@@ -97,9 +99,13 @@ def transform_data():
 
     df_fact_dep = pd.DataFrame(fact_flights_dep)
     df_fact_arr = pd.DataFrame(fact_flights_arr)
-    df_fact_flights = pd.concat([df_fact_dep, df_fact_arr])
     df_fact_flights = pd.concat([df_fact_dep, df_fact_arr]).dropna(
-        subset="scheduled_departure"
+        subset=[
+            "scheduled_departure",
+            "origin_airport_code",
+            "destination_airport_code",
+            "airline_code",
+        ]
     )
     df_raw = pd.concat([df_departure, df_arrival])
     print(df_fact_flights.head(3)[["origin_airport_code", "scheduled_departure"]])

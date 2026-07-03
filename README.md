@@ -59,7 +59,7 @@ The pipeline runs in three layers:
 
 The `flights_pipeline` DAG runs daily with two sequential tasks:
 download_data → load_data
-- `download_data` — fetches flights from AeroDataBox and saves JSON to `raw/data/`
+- `download_data` — fetches flights for the DAG's logical date (`ds`, i.e. the day that just completed) from AeroDataBox and saves JSON to `raw/data/`
 - `load_data` — transforms and loads into PostgreSQL using `ON CONFLICT DO NOTHING` for idempotency
 
 ---
@@ -75,7 +75,7 @@ pip install -r requirements.txt
 ```
 
 Create a `.env` file in the project root:
-RAPIDAPI_KEY=your_api_key
+APIKEY=your_api_key
 DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=flight_db
@@ -85,8 +85,15 @@ Then run:
 
 ```bash
 python processed/db_setup.py   # create tables
-python raw/ingest.py           # download data
+python raw/ingest.py           # download yesterday's data
 python processed/load.py       # transform and load
+```
+
+`raw/ingest.py` downloads yesterday by default. For a specific day or a historical backfill:
+
+```bash
+python raw/ingest.py --date 2026-06-15                  # single day
+python raw/ingest.py --start 2026-04-04 --end 2026-05-07 # date range
 ```
 
 ---

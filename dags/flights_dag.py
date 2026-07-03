@@ -1,9 +1,9 @@
 from airflow.decorators import dag, task
-from datetime import datetime
+from datetime import date, datetime
 import sys
 import os
 
-sys.path.append("/mnt/c/Users/orlan/OneDrive/Escritorio/Data Engineer/flights-pipeline")
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from raw.ingest import download_data
 from processed.load import load_data
@@ -19,8 +19,8 @@ from processed.load import load_data
 def flights_pipeline():
 
     @task()
-    def ingest():
-        download_data()
+    def ingest(ds=None):
+        download_data(date.fromisoformat(ds))
 
     @task()
     def load():
